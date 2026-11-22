@@ -721,8 +721,10 @@ mod win32 {
             Ok(RegValueBackup::Qword(val))
         } else if val_type == REG_SZ || val_type == REG_EXPAND_SZ {
             let u16_slice: Vec<u16> = buf
-                .chunks_exact(2)
-                .map(|c| u16::from_le_bytes([c[0], c[1]]))
+                .as_chunks::<2>()
+                .0
+                .iter()
+                .map(|&c| u16::from_le_bytes(c))
                 .collect();
             let trimmed = match u16_slice.iter().position(|&c| c == 0) {
                 Some(pos) => &u16_slice[..pos],
@@ -1264,8 +1266,7 @@ pub fn apply_tweaks(tweak_ids: &[String], backup_dir: &Path) -> Result<BackupSna
 
     save_snapshot(backup_dir, &snapshot)?;
 
-    let mut applied_count = 0usize;
-    for target in &targets_to_apply {
+    for (applied_count, target) in targets_to_apply.iter().enumerate() {
         let apply_res = match *target {
             TweakTargetSpec::Registry {
                 hive,
@@ -1291,7 +1292,6 @@ pub fn apply_tweaks(tweak_ids: &[String], backup_dir: &Path) -> Result<BackupSna
             }
             return Err(err);
         }
-        applied_count += 1;
     }
 
     Ok(snapshot)

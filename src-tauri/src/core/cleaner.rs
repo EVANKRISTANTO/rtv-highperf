@@ -647,7 +647,7 @@ pub fn clean_dir_entries(
     };
 
     // Remove empty subdirectories deepest-first; non-empty ones (holding locked files) stay intact.
-    dirs.sort_by(|a, b| b.0.cmp(&a.0));
+    dirs.sort_by_key(|a| std::cmp::Reverse(a.0));
     for (_, dir) in dirs {
         let _ = std::fs::remove_dir(dir);
     }

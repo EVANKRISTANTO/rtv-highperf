@@ -363,8 +363,10 @@ fn read_registry_run_scope(
         let name = String::from_utf16_lossy(&name_buf[..name_len as usize]);
         if !name.is_empty() && (val_type == REG_SZ.0 || val_type == REG_EXPAND_SZ.0) {
             let u16_slice: Vec<u16> = data_buf[..data_len as usize]
-                .chunks_exact(2)
-                .map(|c| u16::from_le_bytes([c[0], c[1]]))
+                .as_chunks::<2>()
+                .0
+                .iter()
+                .map(|&c| u16::from_le_bytes(c))
                 .collect();
             let command = from_wide_lossy(&u16_slice).trim().to_string();
             let enabled = approved_map
@@ -648,7 +650,7 @@ pub fn list_startup_items() -> Vec<StartupItem> {
 
     items.extend(read_scheduled_tasks());
 
-    items.sort_by(|a, b| a.name.to_ascii_lowercase().cmp(&b.name.to_ascii_lowercase()));
+    items.sort_by_key(|a| a.name.to_ascii_lowercase());
     items
 }
 
