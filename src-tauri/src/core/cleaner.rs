@@ -79,11 +79,20 @@ fn locallow_appdata_dir() -> Option<PathBuf> {
     env_path("USERPROFILE").map(|p| p.join("AppData").join("LocalLow"))
 }
 
+fn canonical_dedup_key(path: &Path) -> String {
+    if let Ok(canon) = std::fs::canonicalize(path) {
+        return canon.to_string_lossy().to_ascii_lowercase();
+    }
+    path.to_string_lossy()
+        .trim_end_matches(['\\', '/'])
+        .to_ascii_lowercase()
+}
+
 fn push_if_allowed_and_unique(out: &mut Vec<PathBuf>, seen: &mut HashSet<String>, path: PathBuf) {
     if !safety::is_allowed_clean_root(&path) {
         return;
     }
-    let key = path.to_string_lossy().to_ascii_lowercase();
+    let key = canonical_dedup_key(&path);
     if seen.insert(key) {
         out.push(path);
     }
@@ -373,6 +382,7 @@ fn scan_directory_totals(paths: &[PathBuf]) -> (u64, u64) {
             let mut total_files = 0u64;
 
             for entry in WalkDir::new(root)
+                .parallelism(jwalk::Parallelism::Serial)
                 .skip_hidden(false)
                 .follow_links(false)
                 .into_iter()
@@ -584,6 +594,7 @@ pub fn clean_dir_entries(
             continue;
         }
         for entry in WalkDir::new(root)
+            .parallelism(jwalk::Parallelism::Serial)
             .skip_hidden(false)
             .follow_links(false)
             .into_iter()
@@ -882,5 +893,23 @@ mod tests {
         let err = clean_categories(&["nonexistent_cat".to_string()], false)
             .expect_err("unknown category should return InvalidInput");
         assert!(matches!(err, AppError::InvalidInput(_)));
+    }
+
+    #[test]
+    fn test_push_if_allowed_and_unique_canonicalizes() {
+        let mut out = Vec::new();
+        let mut seen = HashSet::new();
+        let temp = std::env::temp_dir();
+        let canon = std::fs::canonicalize(&temp).unwrap_or_else(|_| temp.clone());
+        let canon_stripped = PathBuf::from(
+            canon
+                .to_string_lossy()
+                .trim_start_matches(r"\\?\")
+                .to_string(),
+        );
+
+        push_if_allowed_and_unique(&mut out, &mut seen, temp);
+        push_if_allowed_and_unique(&mut out, &mut seen, canon_stripped);
+        assert_eq!(out.len(), 1, "equivalent temp paths must deduplicate to 1");
     }
 }
