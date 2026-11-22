@@ -35,7 +35,7 @@ An open-source, offline-first Windows 10/11 performance optimizer written in Rus
 
 ### 4. Safe Tweaker & Separate AppX Bloatware Manager
 - **Categorized Registry & Service Tweaks:** Covers Latency & Gaming, Privacy & Telemetry, UI Snappiness, and Safe Background Services. Every tweak displays its plain-language impact, risk level (`Safe`, `Moderate`, `Advanced`), whether Administrator privileges are required, the exact target registry path or service name, and current vs. target values.
-- **Automatic JSON Snapshot Rollback & `.reg` Export:** Before applying any tweak batch, `rtv-highperf` saves a pre-change snapshot to `%APPDATA%\rtv-highperf\backups\snapshot-<timestamp>.json` (recording missing keys/values as `"__NOT_EXISTED__"` so rollback deletes newly created entries cleanly). Any snapshot can be restored in one click or exported as a standard `.reg` file.
+- **Automatic JSON Snapshot Rollback & `.reg` Export:** Before applying any tweak batch, `rtv-highperf` saves a pre-change snapshot to `%APPDATA%\rtv-highperf\backups\snapshot-<timestamp>.json` (recording missing keys/values as `"NotExisted"` so rollback deletes newly created entries cleanly). Any snapshot can be restored in one click or exported as a standard `.reg` file.
 - **Separate AppX Bloatware Manager:** Located in a distinct panel inside Safe Tweaker with an explicit non-reversible warning. Uninstalls UWP apps for the **current user only** (`Remove-AppxPackage`) and protects essential system packages (`Microsoft.WindowsStore`, `Microsoft.WindowsTerminal`, `Microsoft.DesktopAppInstaller`, `Microsoft.WindowsCalculator`, `Microsoft.Windows.Photos`). Reinstalling removed Store apps requires Microsoft Store or internet access and is intentionally separated from offline registry rollback.
 
 ---
@@ -72,8 +72,8 @@ rtv-highperf.exe --cli status
 # Preview cleanable caches without deleting files
 rtv-highperf.exe --cli clean --dry-run
 
-# Clean specific cache categories (e.g. temp and shader caches)
-rtv-highperf.exe --cli clean --categories temp,shader
+# Clean specific cache categories (e.g. user temp and GPU shader caches)
+rtv-highperf.exe --cli clean --categories user_temp,gpu_shaders
 
 # Run a manual idle-RAM trim pass
 rtv-highperf.exe --cli boost --trim-ram

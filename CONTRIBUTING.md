@@ -39,7 +39,7 @@ All new Registry or Service tweaks belong in `src-tauri/src/core/tweaker.rs` and
 
 3. **Guaranteed Snapshot & Rollback Semantics:**
    - Before applying changes, `tweaker.rs` must read the live prior state and persist it into `%APPDATA%\rtv-highperf\backups\snapshot-<timestamp>.json`.
-   - If a registry key or value does not exist prior to applying the tweak, the snapshot **must** record `"__NOT_EXISTED__"` (or equivalent missing-key marker) so that rollback and `.reg` export cleanly delete the added value instead of writing empty placeholder data.
+   - If a registry key or value does not exist prior to applying the tweak, the snapshot **must** record `"NotExisted"` (or equivalent missing-key marker) so that rollback and `.reg` export cleanly delete the added value instead of writing empty placeholder data.
    - Every tweak must be able to read its live state accurately (`is_applied`), revert via snapshot restoration, and export valid `.reg` syntax.
 
 4. **Non-Reversible AppX Packages Stay Separate:**
@@ -48,7 +48,7 @@ All new Registry or Service tweaks belong in `src-tauri/src/core/tweaker.rs` and
 
 5. **Unit Tests Required:**
    - Add unit tests in `src-tauri/src/core/tweaker.rs` covering:
-     - Snapshot capture when the target value previously existed vs. did not exist (`__NOT_EXISTED__`).
+     - Snapshot capture when the target value previously existed vs. did not exist (`"NotExisted"`).
      - `.reg` export formatting for your tweak's value type and deletion syntax.
      - Protected AppX allowlist enforcement (if touching AppX filtering).
    - If you add a cleaner target or process governance rule, add tests verifying:
