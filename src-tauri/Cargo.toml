@@ -1,8 +1,8 @@
 [package]
 name = "rtv-highperf"
-version = "0.1.0"
+version = "0.1.1"
 description = "Open-source, offline-first Windows 10/11 performance optimizer and diagnostics studio"
-authors = ["EVANKRISTANTO"]
+authors = ["Rapticov Indonesia"]
 license = "MIT"
 edition = "2021"
 

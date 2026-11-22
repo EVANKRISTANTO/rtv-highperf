@@ -295,7 +295,8 @@ export function SettingsPage({
               <IconExternalLink size={14} />
               GitHub: EVANKRISTANTO/rtv-highperf
             </a>
-            <span className="badge mono">v0.1.0</span>
+            <span className="badge mono">v0.1.1</span>
+            <span className="badge">Publisher: Rapticov Indonesia</span>
           </div>
         </div>
       </section>
