@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   IconCheck,
   IconExternalLink,
@@ -45,6 +45,10 @@ export function SettingsPage({
     Boolean(config?.auto_start_elevated)
   );
   const [notice, setNotice] = useState<string | null>(null);
+
+  useEffect(() => {
+    setElevatedAutostart(Boolean(config?.auto_start_elevated));
+  }, [config?.auto_start_elevated]);
 
   async function updateConfig(partial: Partial<AppConfig>, key: string) {
     if (!config) return;
@@ -250,7 +254,7 @@ export function SettingsPage({
           </div>
 
           <ToggleSwitch
-            checked={config?.unload_webview_on_tray ?? true}
+            checked={config?.unload_webview_on_tray ?? false}
             disabled={
               !connected || !config || savingKey === "unload_webview_on_tray"
             }
